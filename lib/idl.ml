@@ -171,7 +171,12 @@ struct
         end
       | Returning (t, e) ->
         let wire_name = get_wire_name !description name in
-        let call = Rpc.call wire_name ((Rpc.Dict named)::(List.rev unnamed)) in
+        let args =
+          match named with
+          | [] -> List.rev unnamed
+          | _ -> (Rpc.Dict named) :: List.rev unnamed
+        in
+        let call = Rpc.call wire_name args in
         let r = rpc call in
         if r.Rpc.success
         then match Rpcmarshal.unmarshal t.Param.typedef.Rpc.Types.ty r.Rpc.contents with Ok x -> x | Error (`Msg x) -> raise (MarshalError x)
@@ -212,7 +217,12 @@ struct
         end
       | Returning (t, e) ->
         let wire_name = get_wire_name !description name in
-        let call = Rpc.call wire_name ((Rpc.Dict named)::(List.rev unnamed)) in
+        let args =
+          match named with
+          | [] -> List.rev unnamed
+          | _ -> (Rpc.Dict named) :: List.rev unnamed
+        in
+        let call = Rpc.call wire_name args in
         let r = R.rpc call in
         if r.Rpc.success
         then match Rpcmarshal.unmarshal t.Param.typedef.Rpc.Types.ty r.Rpc.contents with Ok x -> x | Error (`Msg x) -> raise (MarshalError x)
