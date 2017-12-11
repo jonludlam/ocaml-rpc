@@ -20,6 +20,11 @@ module Method = struct
     match m with
     | Returning (x,y) -> Idl.Param.Boxed x
     | Function (x,y) -> find_output y
+
+  let rec find_errors : type a. a outerfn -> Rpc.Types.boxed_def = fun m ->
+    match m with
+    | Returning (x,y) -> Rpc.Types.BoxedDef (y.Idl.Error.def)
+    | Function (x,y) -> find_errors y
 end
 
 type boxed_fn =

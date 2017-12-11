@@ -46,7 +46,7 @@ let rec gentest : type a. a typ -> a list  = fun t ->
         let contents = gentest v.tcontents in
         let content = List.nth contents (Random.int (List.length contents)) in
         v.treview content) variants
-
+  | Abstract _ -> []
 let thin d result =
   if d < 0
   then [List.hd result]
@@ -98,3 +98,43 @@ let rec genall : type a. int -> string -> a typ -> a list  = fun depth strhint t
     List.map (function Rpc.Types.BoxedTag v ->
         let contents = genall (depth - 1) strhint v.tcontents in
         List.map (fun content -> v.treview content) contents) variants |> List.flatten |> thin depth
+  | Abstract _ ->
+    []
+let rec gen_nice : type a. a typ -> string -> a = fun ty hint ->
+  let narg n = Printf.sprintf "%s_%d" hint n in
+  match ty with
+  | Basic Int -> 0
+  | Basic Int32 -> 0l
+  | Basic Int64 -> 0L
+  | Basic Bool -> true
+  | Basic Float -> 0.0
+  | Basic String -> hint
+  | Basic Char -> 'a'
+  | DateTime -> "19700101T00:00:00Z"
+  | Array typ -> [| gen_nice typ (narg 1); gen_nice typ (narg 2)|]
+  | List (Tuple (Basic String, typ)) ->
+    ["field_1", gen_nice typ "value_1"; "field_2", gen_nice typ "value_2"]
+  | List typ -> [gen_nice typ (narg 1); gen_nice typ (narg 2)]
+  | Dict (String, typ) ->
+    ["field_1", gen_nice typ "value_1"; "field_2", gen_nice typ "value_2"]
+  | Dict (basic, typ) ->
+    [ gen_nice (Basic basic) "field_1", gen_nice typ (narg 1); gen_nice (Basic basic) "field_2", gen_nice typ (narg 2)]
+  | Unit -> ()
+  | Option ty ->
+    Some (gen_nice ty (Printf.sprintf "optional_%s" hint))
+  | Tuple (x, y) ->
+    (gen_nice x (narg 1), gen_nice y (narg 2))
+  | Struct { constructor; fields } -> begin
+    let fget : type a. string -> a typ -> (a, Rresult.R.msg) Result.result = fun name ty ->
+      Result.Ok (gen_nice ty name)
+    in
+    match constructor { fget } with Result.Ok x -> x | Result.Error y -> failwith "Bad stuff"
+    end
+  | Variant { variants } -> begin
+    List.hd variants |> function Rpc.Types.BoxedTag v ->
+        let content = gen_nice v.tcontents v.tname in
+        v.treview content
+    end
+  | Abstract _ -> begin
+      failwith "Can't generate abstract types"
+  end
