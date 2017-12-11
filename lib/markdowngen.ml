@@ -249,16 +249,16 @@ let ocaml_of_method (Codegen.BoxedFunction m) =
 let tabs_of namespace is i m =
   let (json,json_response) = json_of_method namespace is i m in
   let ocaml = ocaml_of_method m in
-  let python = Pythongen.example_stub_user i m |> Pythongen.string_of_ts in
-  let python_server = Pythongen.example_skeleton_user i m |> Pythongen.string_of_ts in
+(*  let python = Pythongen.example_stub_user i m |> Pythongen.string_of_ts in
+  let python_server = Pythongen.example_skeleton_user i m |> Pythongen.string_of_ts in*)
   [ "> Client"; "";
     Printf.sprintf "```json\n%s\n```" json; "";
     Printf.sprintf "```ocaml\n%s\n```" ocaml; "";
-    Printf.sprintf "```python\n%s\n```" python; "";
-    "> Server"; "";
+(*    Printf.sprintf "```python\n%s\n```" python; ""; *)
+(*    "> Server"; "";
     Printf.sprintf "```json\n%s\n```" json_response; "";
     Printf.sprintf "```ocaml\n%s\n```" ocaml; "";
-    Printf.sprintf "```python\n%s\n```" python_server; "";
+    Printf.sprintf "```python\n%s\n```" python_server; ""; *)
   ]
 
 let of_method namespace is i (Codegen.BoxedFunction m) =
