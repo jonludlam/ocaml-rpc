@@ -19,6 +19,13 @@
   (preprocess (pps (ppx_deriving_rpc)))
   ))
 
+(executable
+ ((name xapi_example)
+  (modules (aPI xapi_example))
+  (libraries (rpclib rpclib.cmdliner rpclib.markdown unix uuidm rpclib.dbgen))
+  (preprocess (pps (ppx_deriving_rpc)))
+  ))
+
 (alias
  ((name   runexamples)
   (deps   (example.exe))

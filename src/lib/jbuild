@@ -15,6 +15,14 @@
  ))
 
 (library
+ ((name dbgen)
+  (public_name rpclib.dbgen)
+  (modules (dbgen))
+  (libraries (rpclib.core threads))
+  (wrapped false)
+))
+
+(library
  ((name xml)
   (public_name rpclib.xml)
   (modules (xmlrpc))
