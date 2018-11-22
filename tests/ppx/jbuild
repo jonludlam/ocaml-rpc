@@ -7,6 +7,7 @@
      rpclib
      rpclib.core
      rpclib.json
+     rpclib.dbgen
      rresult
      ))
   (preprocess (pps (ppx_deriving_rpc)))
